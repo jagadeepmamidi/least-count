@@ -1,0 +1,153 @@
+# Least Count Score Tracker — Implementation Plan
+
+A premium Android app for tracking **Least Count** card game scores. Built with **Expo (React Native)** and packaged as an APK via **EAS Build** (cloud — no Android Studio needed).
+
+---
+
+## Tech Stack
+
+| Layer | Technology | Purpose |
+|-------|-----------|---------|
+| **Framework** | Expo SDK (React Native) | Cross-platform native app |
+| **Language** | TypeScript | Type safety |
+| **Navigation** | Expo Router (file-based) | Screen navigation with transitions |
+| **Animations** | React Native Reanimated + Moti | 60fps native-thread animations |
+| **Styling** | StyleSheet + Linear Gradients | Native performant styling |
+| **Storage** | AsyncStorage | Persist game data on device |
+| **Haptics** | Expo Haptics | Tactile feedback on eliminations |
+| **APK Build** | EAS Build (cloud) | Generates APK without Android Studio |
+
+---
+
+## Project Structure
+
+```
+least-count/
+├── app/                      # Expo Router file-based routing
+│   ├── _layout.tsx           # Root layout (fonts, theme provider)
+│   ├── index.tsx             # Home screen
+│   ├── setup.tsx             # Player setup screen
+│   └── scorecard.tsx         # Main scorecard screen
+├── components/
+│   ├── PlayerCard.tsx        # Animated player name card
+│   ├── ScoreTable.tsx        # Score table with sticky headers
+│   ├── NumPad.tsx            # Bottom-sheet numeric keypad
+│   ├── Confetti.tsx          # Canvas confetti celebration
+│   └── Toast.tsx             # Slide-in notification
+├── utils/
+│   ├── gameLogic.ts          # Score calc, elimination, winner
+│   └── storage.ts            # AsyncStorage helpers
+├── constants/
+│   └── theme.ts              # Colors, fonts, spacing tokens
+├── app.json                  # Expo config
+├── eas.json                  # EAS Build config
+└── package.json
+```
+
+---
+
+## Screens
+
+### 1. Home Screen (`app/index.tsx`)
+- **New Game** — Large animated button with gradient
+- **Game History** — List of saved games (date, players, winner)
+- Tap history item → view final scorecard
+- Dark card-table themed background with subtle particle/glow effects
+
+### 2. Player Setup (`app/setup.tsx`)
+- Text input + animated "Add" button
+- Player cards animate in with spring physics (`Entering` from Reanimated)
+- Swipe-to-remove with `Exiting` animation
+- Min 2 players to enable "Start Game"
+- Smooth page transition to scorecard
+
+### 3. Scorecard (`app/scorecard.tsx`) — Main Screen
+- **Horizontal + Vertical scroll** table
+- **Sticky header** row (player names) + **sticky total** row at bottom
+- Tap any cell → **NumPad** slides up from bottom
+- **Auto-sum** totals update in real-time with number roll animation
+- **Warning glow** (amber pulse) when player total ≥ 150
+- **Elimination** at 201+: column fades + shakes + ❌ badge + haptic buzz
+- **Undo** button for last score entry
+- **Winner detection**: confetti + crown animation for last player standing
+- **Auto-save** to AsyncStorage on every score change
+
+---
+
+## UI Design
+
+| Token | Value |
+|-------|-------|
+| **Background** | `#0a0f0d` (near-black) |
+| **Surface** | `#1a2520` (dark green-gray) |
+| **Accent** | `#10b981` (emerald) |
+| **Warning** | `#f59e0b` (amber) |
+| **Danger** | `#ef4444` (red) |
+| **Text** | `#f0fdf4` (soft white) |
+| **Font** | Inter (body) / Outfit (headings) via `expo-font` |
+
+**Animation details:**
+- Page transitions: shared element + slide
+- Score entry: cell pulse + number count-up
+- Elimination: shake (300ms) → grayscale fade → ❌ drop-in
+- Winner: full-screen confetti (3s) + crown bounce
+- All animations run on **UI thread** via Reanimated worklets = zero jank
+
+---
+
+## Game Logic (`utils/gameLogic.ts`)
+
+```
+createGame(players: string[]) → Game
+addRound(game: Game) → Game
+setScore(game, roundIdx, playerIdx, score) → Game
+undoLastScore(game) → Game
+getTotal(game, playerIdx) → number
+isEliminated(game, playerIdx) → boolean (total ≥ 201)
+isWarning(game, playerIdx) → boolean (total ≥ 150)
+getActivePlayers(game) → Player[]
+getWinner(game) → string | null (last standing)
+```
+
+---
+
+## APK Build (No Android Studio!)
+
+#### [NEW] `eas.json`
+```json
+{
+  "build": {
+    "preview": {
+      "android": {
+        "buildType": "apk"
+      }
+    }
+  }
+}
+```
+
+**Build commands:**
+```bash
+npm install -g eas-cli          # One-time setup
+eas login                       # Login to Expo account (free)
+eas build --platform android --profile preview   # Builds APK in cloud
+# → Download link appears in ~10 min → share APK with friends!
+```
+
+> [!IMPORTANT]
+> You'll need a **free Expo account** at [expo.dev](https://expo.dev) for EAS Build. Free tier gives 30 builds/month.
+
+---
+
+## Verification Plan
+
+### Dev Testing
+1. Run `npx expo start` → test on phone via **Expo Go** app
+2. Full flow: Home → Setup → Add players → Score rounds → Elimination → Winner
+3. Edge cases: 2 players, 20+ players, exact 201, undo at round 1
+
+### APK Testing
+1. Build via `eas build --platform android --profile preview`
+2. Install APK on physical device
+3. Verify animations are 60fps, no jank
+4. Play a real game with friends

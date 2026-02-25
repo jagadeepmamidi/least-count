@@ -1,0 +1,71 @@
+# Least Count Score Tracker — Tasks
+
+## Planning
+- [x] Gather requirements and answer user questions
+- [x] Decide tech stack (Expo + React Native)
+- [x] Write implementation plan
+- [x] Get user approval on plan
+
+## Project Setup
+- [x] Create Expo project with TypeScript template
+- [x] Install dependencies (Reanimated, AsyncStorage, Haptics, LinearGradient)
+- [x] Set up Expo Router file-based navigation
+- [x] Configure theme constants (colors, fonts, spacing)
+
+## Screens & UI
+- [x] Home screen — New Game + Game History
+- [x] Player Setup screen — Add/remove players
+- [x] Scorecard screen — Score table + sticky headers/totals
+- [x] NumPad component — Bottom-sheet numeric keypad
+- [x] Confetti component — Winner celebration
+- [x] Toast component — Notifications
+
+## Game Logic
+- [x] Core game logic (create, addRound, setScore, undo)
+- [x] Auto-sum, elimination (201+), warning (150+)
+- [x] Winner detection (last player standing)
+- [x] AsyncStorage persistence (save/load games)
+
+## Animations & Polish
+- [x] Page transitions (fade)
+- [x] Score cell entry animations (pulse on change)
+- [x] Elimination badge (✕) + reduced opacity
+- [x] Winner confetti + crown animation
+- [x] Warning styling at 150+
+
+## Bug Fixes
+- [x] B1: Error state when game not found (instead of infinite loading)
+- [x] B2: Sentinel constant SCORE_NOT_ENTERED replaces magic number -1
+- [x] B3: Auto-add new round when current round is complete
+- [x] B4: GameCard animation uses stable game.id dep
+- [x] B5: Splash background color matches COLORS.background (#000000)
+
+## Code Quality
+- [x] C1: Named SCORE_NOT_ENTERED constant in gameLogic.ts
+- [x] C2: Duplicate player name validation in setup screen
+- [x] C7: Stable keys for player chips (numeric ID instead of name+index)
+- [x] C8: useCallback on all handlers in scorecard screen
+
+## UX Improvements
+- [x] U1: Auto-advance to next empty cell after score submit
+- [x] U2: Long-press hint text on game history
+- [x] U3: Confirm before closing only if game is in progress
+- [x] U4: Round total column per row
+- [x] U6: Quick-zero button in NumPad for round winners
+
+## Features
+- [x] Horizontal scroll for scorecard with 5+ players
+- [x] Sticky header row (player names stay visible)
+- [x] LinearGradient on New Game button
+- [x] Read-only "final scores" mode for finished games
+- [x] Elimination ✕ badge on totals row
+
+## Build / Config
+- [x] Configure eas.json for APK builds
+- [x] Remove unused dependency (react-native-svg)
+- [x] Fix splash background color mismatch
+- [x] Asset files verified (icon, splash, adaptive-icon, favicon)
+
+## Verification
+- [ ] Full flow test in Expo Go
+- [ ] APK install + test on device
