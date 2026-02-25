@@ -9,7 +9,6 @@ import {
   Animated,
   ScrollView,
   Platform,
-  KeyboardAvoidingView,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -108,10 +107,7 @@ export default function SetupScreen() {
   ) && playerName.trim().length > 0;
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
+    <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
@@ -150,7 +146,6 @@ export default function SetupScreen() {
               onChangeText={setPlayerName}
               onSubmitEditing={addPlayer}
               returnKeyType="done"
-              autoFocus
               maxLength={20}
             />
           </View>
@@ -168,8 +163,14 @@ export default function SetupScreen() {
         )}
       </View>
 
-      {/* Players */}
-      <ScrollView style={styles.playersList} showsVerticalScrollIndicator={false}>
+      {/* Players list */}
+      <ScrollView
+        style={styles.playersList}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+        contentContainerStyle={styles.playersListContent}
+      >
         {players.length === 0 ? (
           <View style={styles.emptyState}>
             <View style={styles.emptyCards}>
@@ -198,13 +199,12 @@ export default function SetupScreen() {
         )}
       </ScrollView>
 
-      {/* Start */}
+      {/* Start button — fixed at bottom, always visible */}
       <View style={styles.bottomSection}>
         <TouchableOpacity
           onPress={startGame}
           disabled={players.length < 2}
           activeOpacity={0.6}
-          style={[styles.startButton, players.length < 2 && styles.startButtonDisabled]}
         >
           {players.length >= 2 ? (
             <LinearGradient
@@ -217,11 +217,13 @@ export default function SetupScreen() {
               <Text style={styles.startSuit}>♠</Text>
             </LinearGradient>
           ) : (
-            <Text style={[styles.startText, styles.startTextDisabled]}>need more players</Text>
+            <View style={styles.startDisabledInner}>
+              <Text style={[styles.startText, styles.startTextDisabled]}>need more players</Text>
+            </View>
           )}
         </TouchableOpacity>
       </View>
-    </KeyboardAvoidingView>
+    </View>
   );
 }
 
@@ -368,21 +370,19 @@ const styles = StyleSheet.create({
     paddingBottom: 36, paddingTop: SPACING.lg,
     borderTopWidth: 1, borderTopColor: COLORS.border,
   },
-  startButton: {
-    borderRadius: RADIUS.sm,
-    overflow: 'hidden',
-  },
-  startButtonDisabled: {
-    backgroundColor: COLORS.surface,
-    borderWidth: 1, borderColor: COLORS.border,
-    paddingVertical: SPACING.lg,
-    alignItems: 'center', justifyContent: 'center',
-  },
   startGradient: {
     flexDirection: 'row',
     alignItems: 'center', justifyContent: 'center',
     gap: SPACING.sm,
     paddingVertical: SPACING.lg,
+    borderRadius: RADIUS.sm,
+  },
+  startDisabledInner: {
+    alignItems: 'center', justifyContent: 'center',
+    paddingVertical: SPACING.lg,
+    borderRadius: RADIUS.sm,
+    backgroundColor: COLORS.surface,
+    borderWidth: 1, borderColor: COLORS.border,
   },
   startText: {
     fontSize: FONT_SIZE.md, fontWeight: '600',
